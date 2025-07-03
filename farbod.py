@@ -1,11 +1,11 @@
 from tkinter import *
 class Person :
-    def __init__ (self,name,health,intrest,speaker,sensitivity):
+    def __init__ (self,name,health,intrest,speaker,mobility):
         self.name = name
         self.health = health #healthy, suspect, sick
         self.intrest = intrest #math, AI, art, economy
         self.speaker = speaker #True, False
-        self.sensitivity = sensitivity #0, 1, 2
+        self.mobility = mobility #0, 1, 2
 def mahan(newGuest,hall):
     scores = []
     for i in range(10):
@@ -39,8 +39,8 @@ def score_seat(hall,guest,x,y):
                 except:
                     pass
     else:
-        auth = int(guest.sensitivity)
-        if guest.speaker == "yes" and guest.sensitivity == "0":
+        auth = int(guest.mobility)
+        if guest.speaker == "yes" and guest.mobility == "0":
             auth += 1
         for i in range(-(2+auth),3+auth):
             temp = abs(i)
@@ -68,36 +68,36 @@ def score_seat(hall,guest,x,y):
             score -= 5
     #mobilty check
     if y != 0 and y != 0:
-        score -= 5*int(guest.sensitivity)
+        score -= 5*int(guest.mobility)
     return score
     
                          
 def main():
     hall=[[None,None,None,None,None,None,None,None,None,None] for x in range(10)]
     hallButton=[[None,None,None,None,None,None,None,None,None,None] for x in range(10)]
-    helperOpen = False
+    helperOpen = [False]
 
     def mkGuest(hall):
-        newGuest = Person(name=newName.get(),health=newHealth.get(),intrest=newInterest.get(),speaker=newSpeaker.get(),sensitivity=newSensitivity.get())
+        newGuest = Person(name=newName.get(),health=newHealth.get(),intrest=newInterest.get(),speaker=newSpeaker.get(),mobility=newmobility.get())
         if newGuest.health == "healthy" or newGuest.health == "suspect" or newGuest.health == "sick":
             if newGuest.intrest == "math" or newGuest.intrest == "ai" or newGuest.intrest == "art" or newGuest.intrest == "economy":
                 if newGuest.speaker == "yes" or newGuest.speaker == "no":
-                    if newGuest.sensitivity == "0" or newGuest.sensitivity == "1" or newGuest.sensitivity == "2":
+                    if newGuest.mobility == "0" or newGuest.mobility == "1" or newGuest.mobility == "2":
                         hall,x,y = mahan(newGuest,hall)
                         hallButton[x][y].config(text=f"{x*10}{y}\n{newGuest.name}")
     def openhelper(x,y,helperOpen):
         def closehelper():
             helperWindow.destroy()
-            helperOpen = False
-        if helperOpen == False and hall[x][y] != None:
-            helperOpen = True
+            helperOpen[0] = False
+        if helperOpen[0] == False and hall[x][y] != None:
+            helperOpen[0] = True
             helperWindow = Toplevel(mainWindow)
-            Label(helperWindow,text=f"name: {hall[x][y].name}").place()
-            Label(helperWindow,text=f"health status: {hall[x][y].health}").place()
-            Label(helperWindow,text=f"intrest: {hall[x][y].intrest}").place()
-            Label(helperWindow,text=f"is speaker: {hall[x][y].speaker}").place()
-            Label(helperWindow,text=f"sensitivity: {hall[x][y].sensitivity}").place()
-            Button(helperWindow,text="close",command=closehelper)
+            Label(helperWindow,text=f"name: {hall[x][y].name}").pack()
+            Label(helperWindow,text=f"health status: {hall[x][y].health}").pack()
+            Label(helperWindow,text=f"intrest: {hall[x][y].intrest}").pack()
+            Label(helperWindow,text=f"is speaker: {hall[x][y].speaker}").pack()
+            Label(helperWindow,text=f"mobility: {hall[x][y].mobility}").pack()
+            Button(helperWindow,text="close",command=closehelper).pack()
 
     mainWindow = Tk()
     for i in range(10):
@@ -116,9 +116,9 @@ def main():
     Label(text="will the guest be speaking? (yes/no)").grid(row = 13,column=10)
     newSpeaker = Entry(mainWindow,font = ('Arial',15))
     newSpeaker.grid(row = 13,column=11)
-    Label(text="how sensitive is the guest? (0, 1, 2)").grid(row = 14,column=10)
-    newSensitivity = Entry(mainWindow,font = ('Arial',15))
-    newSensitivity.grid(row = 14,column=11)
+    Label(text='does the guest use a wheelchair or a cane to walk?\n("0" for none, "1" for cane, "2" for wheelchair)').grid(row = 14,column=10)
+    newmobility = Entry(mainWindow,font = ('Arial',15))
+    newmobility.grid(row = 14,column=11)
     mknewButton = Button(mainWindow,text='add guest',command=lambda:mkGuest(hall))
     mknewButton.grid(row = 15,column=10)
     mainWindow.mainloop()
