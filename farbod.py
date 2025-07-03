@@ -1,21 +1,91 @@
 from tkinter import *
-from classes import Person
+class Person :
+    def __init__ (self,name,health,intrest,speaker,sensitivity):
+        self.name = name
+        self.health = health #healthy, suspect, sick
+        self.intrest = intrest #math, AI, art, economy
+        self.speaker = speaker #True, False
+        self.sensitivity = sensitivity #0, 1, 2
 def mahan(newGuest,hall):
-    return hall
+    scores = []
+    for i in range(10):
+        for j in range(10):
+            if hall[i][j] == None:
+                scores.append([i,j,score_seat(hall,newGuest,i,j)])
+    max = scores[0]
+    for i in range(1,len(scores)):
+        if scores[i][2] > max[2]:
+            max = scores[i]
+    hall[max[0]][max[1]] = newGuest
+    return hall,max[0],max[1]
+def score_seat(hall,guest,x,y):
+    #healthcheck
+    score = 0
+    if guest.health !="healthy":
+        for i in range(-2,3):
+            temp = abs(i)
+            for j in range(temp-2,3-temp):
+                try:
+                    if hall[x+i][y+j].health == "healthy":
+                        score-=1
+                except:
+                    pass
+        for i in range(-3,4):
+            temp = abs(i)
+            for j in range(temp-3,4-temp):
+                try:
+                    if hall[x+i][y+j].speaker == "yes":
+                        score-=1
+                except:
+                    pass
+    else:
+        auth = int(guest.sensitivity)
+        if guest.speaker == "yes" and guest.sensitivity == "0":
+            auth += 1
+        for i in range(-(2+auth),3+auth):
+            temp = abs(i)
+            for j in range(temp-(2+auth),3+auth-temp):
+                try:
+                    if hall[x+i][y+j].health != "healthy":
+                        score-=1
+                except:
+                    pass
+    #intrest check
+    for i in [-1,1]:
+        try:
+            if hall[x+i][y].intrest == guest.intrest:
+                score+=1
+        except:
+            pass
+        try:
+            if hall[x][y+i].intrest == guest.intrest:
+                score+=1
+        except:
+            pass
+    #speaker check
+    if guest.speaker == "yes":
+        if x != 9 and y != 0 and y != 9:
+            score -= 5
+    #mobilty check
+    if y != 0 and y != 0:
+        score -= 5*int(guest.sensitivity)
+    return score
+    
+                         
 def main():
     hall=[[None,None,None,None,None,None,None,None,None,None] for x in range(10)]
     hallButton=[[None,None,None,None,None,None,None,None,None,None] for x in range(10)]
     helperOpen = False
-    hall[0][0] = Person(name="mahan",health="healthy",intrest="ai",speaker="no",sensitivity="0")
-    
-    def mkGuest():
+
+    def mkGuest(hall):
         newGuest = Person(name=newName.get(),health=newHealth.get(),intrest=newInterest.get(),speaker=newSpeaker.get(),sensitivity=newSensitivity.get())
-        if (newGuest.health == ("healthy" or "suspect" or "sick")) and (newGuest.intrest == ("math" or "ai" or "art" or "economy")) and (newGuest.speaker == ("yes" or "no")) and (newGuest.sensitivity == ("0" or "1" or "2")):
-            hall = mahan(newGuest,hall)
-            refresh()
-        def refresh():
-            ...
-    def openhelper(x,y):
+        if newGuest.health == "healthy" or newGuest.health == "suspect" or newGuest.health == "sick":
+            if newGuest.intrest == "math" or newGuest.intrest == "ai" or newGuest.intrest == "art" or newGuest.intrest == "economy":
+                if newGuest.speaker == "yes" or newGuest.speaker == "no":
+                    if newGuest.sensitivity == "0" or newGuest.sensitivity == "1" or newGuest.sensitivity == "2":
+                        hall,x,y = mahan(newGuest,hall)
+                        hallButton[x][y].config(text=f"{x*10}{y}\n{newGuest.name}")
+    def openhelper(x,y,helperOpen):
         def closehelper():
             helperWindow.destroy()
             helperOpen = False
@@ -30,12 +100,10 @@ def main():
             Button(helperWindow,text="close",command=closehelper)
 
     mainWindow = Tk()
-    margin = 30
     for i in range(10):
         for j in range(10):
-            hallButton[i][j] = Button(mainWindow,text=f"{i*10}{j}\nu",command=lambda: openhelper(i,j))#,width=margin,height=margin)
+            hallButton[i][j] = Button(mainWindow,text=f"{i*10}{j}\nu",command=lambda i=i,j=j: openhelper(i,j,helperOpen))
             hallButton[i][j].grid(row=i,column = j)
-    hallButton[0][0].config(text="00\nmahan")
     Label(text="enter name: ").grid(row = 10,column=10)
     newName = Entry(mainWindow,font = ('Arial',15))
     newName.grid(row = 10,column=11)
@@ -51,7 +119,7 @@ def main():
     Label(text="how sensitive is the guest? (0, 1, 2)").grid(row = 14,column=10)
     newSensitivity = Entry(mainWindow,font = ('Arial',15))
     newSensitivity.grid(row = 14,column=11)
-    mknewButton = Button(mainWindow,text='add guest',command=mkGuest)
+    mknewButton = Button(mainWindow,text='add guest',command=lambda:mkGuest(hall))
     mknewButton.grid(row = 15,column=10)
     mainWindow.mainloop()
 if __name__ == "__main__":
