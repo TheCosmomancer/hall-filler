@@ -16,6 +16,32 @@ def mahan(newGuest,hall):
     for i in range(1,len(scores)):
         if scores[i][2] > max[2]:
             max = scores[i]
+    maxes = [item for item in scores if item[2] == max[2]]
+    if len(maxes) > 1:
+        for item in maxes:
+            #check if sick and near edges
+            if newGuest.health != "healthy":
+                if not (3<item[1]<6):
+                    item[2] -= 2
+                if  item[0] > 5:
+                    item[2] -=2
+            else:
+                if item[0] < 6:
+                    item[2] -=1
+            #check if not speaker and in speaker seats
+            if newGuest.speaker != "yes":
+                print(1)
+                if item[0] == 9 or item[1] == 0 or item[1] == 9:
+                    print(2)
+                    item[2] -= 5
+            # check if not disabled and in disabled seats
+            if newGuest.mobility == "0":
+                if item[1] == 0 or item[1] == 9:
+                    item[2] -= 5
+        max = maxes[0]
+        for i in range(1,len(maxes)):
+            if maxes[i][2] > max[2]:
+                max = maxes[i]
     hall[max[0]][max[1]] = newGuest
     return hall,max[0],max[1]
 def score_seat(hall,guest,x,y):
@@ -67,7 +93,7 @@ def score_seat(hall,guest,x,y):
         if x != 9 and y != 0 and y != 9:
             score -= 5
     #mobilty check
-    if y != 0 and y != 0:
+    if y != 0 and y != 9:
         score -= 5*int(guest.mobility)
     return score
     
@@ -102,7 +128,7 @@ def main():
     mainWindow = Tk()
     for i in range(10):
         for j in range(10):
-            hallButton[i][j] = Button(mainWindow,text=f"{i*10}{j}\nu",command=lambda i=i,j=j: openhelper(i,j,helperOpen))
+            hallButton[i][j] = Button(mainWindow,text=f"{i*10}{j}\nempty",command=lambda i=i,j=j: openhelper(i,j,helperOpen))
             hallButton[i][j].grid(row=i,column = j)
     Label(text="enter name: ").grid(row = 10,column=10)
     newName = Entry(mainWindow,font = ('Arial',15))
