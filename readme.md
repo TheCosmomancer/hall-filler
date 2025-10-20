@@ -45,4 +45,4 @@ The seating algorithm uses a scoring system that considers:
 
 ---
 
-*readme writtrn with AI.*
+*readme written with AI.*
